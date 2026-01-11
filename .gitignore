@@ -17,3 +17,6 @@ __pycache__/
 
 # ===== Archives =====
 *.zip
+
+# Web (temporarily ignore)
+apps/web/
