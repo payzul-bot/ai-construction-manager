@@ -1,0 +1,38 @@
+id: wall_painting_v1
+version: 1
+
+enums:
+  base: ["concrete", "plaster", "drywall", "painted_wall", "wallpaper_paintable"]
+  quality: ["econom", "comfort", "premium"]
+
+defaults:
+  coats: 2
+  waste_pct: 10
+
+norms:
+  paint_coverage_m2_per_l_by_base:
+    concrete: 8.0
+    plaster: 9.0
+    drywall: 10.0
+    painted_wall: 11.0
+    wallpaper_paintable: 12.0
+
+  primer_coverage_m2_per_l_by_base:
+    concrete: 10.0
+    plaster: 11.0
+    drywall: 12.0
+    painted_wall: 0.0
+    wallpaper_paintable: 0.0
+
+  labor_hours_per_m2_by_quality:
+    econom: 0.22
+    comfort: 0.28
+    premium: 0.35
+
+bundles:
+  masking_tape_rolls_per_50m2: 1
+  film_rolls_per_40m2: 1
+
+rounding:
+  liters_step: 0.1
+  hours_step: 0.1

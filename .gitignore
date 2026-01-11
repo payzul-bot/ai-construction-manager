@@ -1,0 +1,19 @@
+# ===== Python =====
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ===== Env / Secrets =====
+.env
+
+# ===== IDE =====
+.idea/
+.vscode/
+
+# ===== OS =====
+.DS_Store
+
+# ===== Archives =====
+*.zip

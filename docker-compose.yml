@@ -1,0 +1,81 @@
+services:
+  db:
+    image: postgres:16
+    container_name: platform-db
+    environment:
+      POSTGRES_DB: platform
+      POSTGRES_USER: platform
+      POSTGRES_PASSWORD: platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U platform -d platform"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    container_name: platform-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: platform-api
+
+    # ✅ ЕДИНЫЙ источник API_KEYS и других переменных (если захочешь перенести)
+    env_file:
+      - ./apps/api/.env
+
+    environment:
+      DATABASE_URL: postgresql+psycopg://platform:platform@db:5432/platform
+
+      APP_ENV: dev
+      LOG_LEVEL: INFO
+      CORS_ORIGINS: http://localhost:3000
+
+      # Safety
+      MAX_BODY_BYTES: "1000000" # 1MB
+
+      # Redis
+      REDIS_URL: redis://redis:6379/0
+      RATE_LIMIT_PER_MINUTE: "120"
+      RATE_LIMIT_PREFIX: "rl"
+
+      # Idempotency
+      IDEMPOTENCY_PREFIX: "idem"
+      IDEMPOTENCY_TTL_SEC: "86400"
+      REQUIRE_IDEMPOTENCY: "true"
+
+      # Auth
+      JWT_SECRET: dev-secret-change-me
+      JWT_ISSUER: ai-construction
+      JWT_AUDIENCE: ai-construction-web
+
+      # ✅ ВАЖНО: API_KEYS УБРАН отсюда, чтобы не конфликтовал с .env
+      ALLOW_TENANT_HEADER_FALLBACK: "false"
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+    # dev bind mount
+    volumes:
+      - ./apps/api:/app
+
+volumes:
+  pgdata:
