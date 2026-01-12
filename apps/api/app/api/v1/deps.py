@@ -1,61 +1,91 @@
 from __future__ import annotations
 
-from typing import Generator, Optional
+from typing import Generator
 
-from fastapi import Header, Request
+from fastapi import Depends, Header
 from sqlalchemy.orm import Session
 
-from app.common.context import tenant_id_var
 from app.common.errors import AppError
 from app.common.jwt_auth import JwtVerifier
 from app.infra.db.session import SessionLocal
 from app.settings import settings
 
 
+# -------------------- DB --------------------
+
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
-        db.commit()
-    except Exception:
-        db.rollback()
-        raise
     finally:
         db.close()
 
 
-def get_tenant_id(
-    request: Request,
-    authorization: Optional[str] = Header(default=None),
-    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
-    x_tenant_id: Optional[str] = Header(default=None, alias="X-Tenant-Id"),
-) -> str:
-    # 1) JWT preferred
-    if authorization and authorization.lower().startswith("bearer "):
-        token = authorization.split(" ", 1)[1].strip()
-        verifier = JwtVerifier(settings.jwt_secret, settings.jwt_issuer, settings.jwt_audience)
-        try:
-            claims = verifier.verify(token)
-        except Exception:
-            raise AppError(code="unauthorized", message="Invalid JWT", status_code=401)
-        tid = claims.get("tenant_id")
-        if not tid:
-            raise AppError(code="unauthorized", message="tenant_id missing in JWT", status_code=401)
-        tenant_id_var.set(tid)
-        return tid
+# -------------------- Tenant --------------------
 
-    # 2) API key fallback
-    if x_api_key:
-        m = settings.api_key_map()
-        tid = m.get(x_api_key)
-        if not tid:
-            raise AppError(code="unauthorized", message="Invalid API key", status_code=401)
-        tenant_id_var.set(tid)
-        return tid
+def get_tenant_id(x_tenant_id: str = Header(default="")) -> str:
+    if not x_tenant_id:
+        raise AppError(
+            code="tenant_required",
+            message="X-Tenant-Id header is required",
+            status_code=400,
+        )
+    return x_tenant_id
 
-    # 3) header fallback (only if enabled)
-    if settings.allow_tenant_header_fallback and x_tenant_id:
-        tenant_id_var.set(x_tenant_id)
-        return x_tenant_id
 
-    raise AppError(code="unauthorized", message="Missing auth", status_code=401)
+# -------------------- API KEY --------------------
+
+def require_api_key(x_api_key: str = Header(default="")) -> str:
+    """
+    settings.api_keys format:
+    "name=key,name2=key2"
+    example:
+    API_KEYS=devkey=11111111-1111-1111-1111-111111111111
+    """
+    allowed: dict[str, str] = {}
+
+    raw = (settings.api_keys or "").strip()
+    if raw:
+        for part in raw.split(","):
+            part = part.strip()
+            if not part or "=" not in part:
+                continue
+            name, key = part.split("=", 1)
+            allowed[name.strip()] = key.strip()
+
+    if not x_api_key or x_api_key not in allowed.values():
+        raise AppError(
+            code="unauthorized",
+            message="Invalid API key",
+            status_code=401,
+        )
+
+    return x_api_key
+
+
+# -------------------- JWT (optional) --------------------
+
+def get_current_user(
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """
+    Optional JWT auth.
+    If Authorization header is not provided → returns empty dict.
+    """
+    if not authorization:
+        return {}
+
+    try:
+        scheme, token = authorization.split(" ", 1)
+        if scheme.lower() != "bearer":
+            raise ValueError("Invalid auth scheme")
+    except ValueError:
+        raise AppError(
+            code="invalid_authorization",
+            message="Invalid Authorization header",
+            status_code=401,
+        )
+
+    verifier = JwtVerifier(settings.jwt_secret)
+    payload = verifier.verify(token)
+    return payload
