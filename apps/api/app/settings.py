@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     # --- AUTH ---
     jwt_secret: str = "dev-secret"
     api_keys: str = "devkey=11111111-1111-1111-1111-111111111111"
+    allow_tenant_header_fallback: bool = False
+    default_tenant_id: str = "demo"
 
     # --- DB ---
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
