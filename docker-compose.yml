@@ -42,7 +42,7 @@ services:
 
       APP_ENV: dev
       LOG_LEVEL: INFO
-      CORS_ORIGINS: http://localhost:3000
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3001
 
       # Safety
       MAX_BODY_BYTES: "1000000" # 1MB

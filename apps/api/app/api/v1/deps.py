@@ -60,10 +60,12 @@ def require_api_key(x_api_key: str = Header(default="")) -> str:
             allowed[name.strip()] = key.strip()
 
     if not x_api_key or x_api_key not in allowed.values():
-        raise AppError(
-            code="unauthorized",
-            message="Invalid API key",
-            status_code=401,
+        raise_http(
+            AppError(
+                code="unauthorized",
+                message="Invalid API key",
+                status_code=401,
+            )
         )
 
     return x_api_key
@@ -86,10 +88,12 @@ def get_current_user(
         if scheme.lower() != "bearer":
             raise ValueError("Invalid auth scheme")
     except ValueError:
-        raise AppError(
-            code="invalid_authorization",
-            message="Invalid Authorization header",
-            status_code=401,
+        raise_http(
+            AppError(
+                code="invalid_authorization",
+                message="Invalid Authorization header",
+                status_code=401,
+            )
         )
 
     verifier = JwtVerifier(settings.jwt_secret)
