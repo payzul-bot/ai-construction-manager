@@ -53,6 +53,7 @@ class ProjectsRepo:
         if p is None:
             return False
         self.db.delete(p)
+        self.db.flush()
         return True
 
     def delete_many(self, *, tenant_id: str, project_ids: list[str]) -> int:
