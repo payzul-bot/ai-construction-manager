@@ -4,7 +4,7 @@ from typing import Any
 
 from app.common.errors import AppError
 from app.common.ids import new_uuid
-from app.domain.calc import get_calc_engine_v1
+from app.domain.calc import get_calc_engine_v0
 from app.infra.repo.estimates_repo import EstimatesRepo
 from app.infra.repo.projects_repo import ProjectsRepo
 
@@ -35,7 +35,7 @@ class EstimatesUC:
 
         new_version_no = e.current_version_no + 1
 
-        engine = get_calc_engine_v1()
+        engine = get_calc_engine_v0()
         result: dict[str, Any] = engine.calculate(input)
 
         self.estimates_repo.add_version(

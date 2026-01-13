@@ -22,6 +22,9 @@ The current V0 implementation delivers a working, but informal, engine workflow.
 - The current V0 behavior is explicitly documented as an internal `engine_v0` contract.
 - The contract is immutable and versioned (internal reference only).
 - Documentation clarifies that `engine_v0` is the authoritative description of current behavior, without changes to logic.
+- The contract document includes scope, limitations, and known violations vs. ENGINE_SPEC.
+
+See `ENGINE_V0.md` for the frozen contract description.
 
 **Required Code Changes (High-Level, Not Implemented)**
 - Add a versioned contract document for `engine_v0` (internal-only) aligned with existing behavior.

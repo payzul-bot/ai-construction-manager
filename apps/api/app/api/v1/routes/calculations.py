@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 
 from app.api.v1.deps import require_api_key
 from app.contracts.input_v1 import EstimateInputV1
-from app.domain.calc import get_calc_engine_v1
+from app.domain.calc import get_calc_engine_v0
 
 router = APIRouter(prefix="/calculations")
 
@@ -16,5 +16,5 @@ def calculate(
     body: EstimateInputV1,
     _=Depends(require_api_key),
 ) -> dict[str, Any]:
-    engine = get_calc_engine_v1()
+    engine = get_calc_engine_v0()
     return engine.calculate(body.model_dump())

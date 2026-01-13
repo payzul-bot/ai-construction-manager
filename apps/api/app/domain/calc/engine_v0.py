@@ -4,13 +4,13 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from .errors import CalcFailed, CalcInvalidInput, CalcUnknownWork
-from .registry_v1 import build_registry_v1
+from .registry_v0 import build_registry_v0
 
 CalculatorFn = Callable[[dict[str, Any]], dict[str, Any]]
 
 
 @dataclass(frozen=True)
-class CalcEngineV1:
+class CalcEngineV0:
     registry: dict[str, CalculatorFn]
 
     def calculate(self, input: dict[str, Any]) -> dict[str, Any]:
@@ -44,11 +44,11 @@ class CalcEngineV1:
             raise CalcFailed(f"Calculation failed: {e.__class__.__name__}") from e
 
 
-_engine_singleton: CalcEngineV1 | None = None
+_engine_singleton: CalcEngineV0 | None = None
 
 
-def get_calc_engine_v1() -> CalcEngineV1:
+def get_calc_engine_v0() -> CalcEngineV0:
     global _engine_singleton
     if _engine_singleton is None:
-        _engine_singleton = CalcEngineV1(registry=build_registry_v1())
+        _engine_singleton = CalcEngineV0(registry=build_registry_v0())
     return _engine_singleton
