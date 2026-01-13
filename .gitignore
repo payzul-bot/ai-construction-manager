@@ -18,5 +18,7 @@ __pycache__/
 # ===== Archives =====
 *.zip
 
-# Web (temporarily ignore)
-apps/web/
+# Web
+apps/web/node_modules/
+apps/web/.next/
+apps/web/.env.local
