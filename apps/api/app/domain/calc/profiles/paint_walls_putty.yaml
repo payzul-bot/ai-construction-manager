@@ -1,0 +1,52 @@
+profile_id: "paint_walls_putty@v1"
+work_id: "paint_walls_putty"
+params:
+  - key: "wall_area_m2"
+    type: "number"
+    required: true
+    validation:
+      min: 0
+    ui_hint: "Wall area in square meters"
+  - key: "layers"
+    type: "number"
+    required: true
+    validation:
+      min: 1
+      max: 3
+    ui_hint: "Number of paint layers"
+  - key: "has_openings"
+    type: "boolean"
+    required: false
+    validation: {}
+    ui_hint: "Are there openings in the walls"
+  - key: "openings_area_m2"
+    type: "number"
+    required: false
+    validation:
+      min: 0
+    ui_hint: "Total openings area in square meters"
+  - key: "base_type"
+    type: "enum"
+    required: true
+    options:
+      - "putty"
+    validation: {}
+    ui_hint: "Base substrate type"
+  - key: "include_covering"
+    type: "boolean"
+    required: false
+    validation: {}
+    ui_hint: "Include protective covering"
+formulas: []
+bom: []
+rules: []
+qc:
+  - "Surface is dry"
+  - "No dust or loose particles"
+outputs:
+  materials: []
+  tools: []
+  equipment: []
+  stages: []
+  qc: []
+  risks: []

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, List, Literal
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -33,7 +33,7 @@ class WorkUnit(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     work_id: str = Field(..., min_length=1)
-    calculation_profile_id: str = Field(..., min_length=1)
+    calculation_profile_id: Optional[str] = Field(default=None, min_length=1)
     parameters: Dict[str, Any] = Field(default_factory=dict)
     dependencies: List[str] = Field(default_factory=list)
 
