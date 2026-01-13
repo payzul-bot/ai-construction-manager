@@ -20,3 +20,6 @@ __pycache__/
 
 # Web (temporarily ignore)
 apps/web/
+
+# local backups
+apps/web__local_backup_*/
