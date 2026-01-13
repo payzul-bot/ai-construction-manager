@@ -63,7 +63,8 @@ services:
       JWT_AUDIENCE: ai-construction-web
 
       # ✅ ВАЖНО: API_KEYS УБРАН отсюда, чтобы не конфликтовал с .env
-      ALLOW_TENANT_HEADER_FALLBACK: "false"
+      ALLOW_TENANT_HEADER_FALLBACK: "true"
+      DEFAULT_TENANT_ID: "demo"
 
     depends_on:
       db:
