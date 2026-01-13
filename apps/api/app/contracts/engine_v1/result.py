@@ -11,14 +11,20 @@ from app.contracts.engine_v1.input import EngineInput, ProjectProfile
 
 class WorkStatus(str, Enum):
     PLACEHOLDER = "PLACEHOLDER"
+    UNIMPLEMENTED = "UNIMPLEMENTED"
+    READY_FOR_INPUT = "READY_FOR_INPUT"
+    DRAFT = "DRAFT"
 
 
 class WorkResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     work_id: str
-    calculation_profile_id: str
+    calculation_profile_id: Optional[str] = None
     status: WorkStatus
+    required_params: List[str] = Field(default_factory=list)
+    provided_params: List[str] = Field(default_factory=list)
+    expected_sections: List[str] = Field(default_factory=list)
     parameters: Dict[str, Any] = Field(default_factory=dict)
     dependencies: List[str] = Field(default_factory=list)
     warnings: List[str] = Field(default_factory=list)

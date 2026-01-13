@@ -18,7 +18,6 @@ def _minimal_payload() -> dict:
         "work_graph": [
             {
                 "work_id": "paint_walls_putty",
-                "calculation_profile_id": "profile_placeholder",
                 "parameters": {},
                 "dependencies": [],
             }
@@ -62,6 +61,29 @@ def test_engine_v1_response_structure():
         assert isinstance(payload[key], list)
 
     assert payload["meta"]["engine_version"] == "engine_v1"
+
+
+def test_engine_v1_missing_required_params_warning():
+    client = TestClient(app)
+    response = client.post(
+        "/v1/engine/calculate",
+        json=_minimal_payload(),
+        headers={"X-API-Key": settings.api_keys.split("=", 1)[1]},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    work = payload["works"][0]
+
+    assert work["status"] == "READY_FOR_INPUT"
+    assert work["calculation_profile_id"] == "paint_walls_putty@v1"
+    assert work["required_params"] == ["wall_area_m2", "layers", "base_type"]
+    assert work["provided_params"] == []
+    assert work["warnings"] == [
+        "MISSING_REQUIRED_PARAMS:wall_area_m2,layers,base_type"
+    ]
+    assert payload["meta"]["warnings"] == [
+        "MISSING_REQUIRED_PARAMS:paint_walls_putty:wall_area_m2,layers,base_type"
+    ]
 
 
 def test_engine_v1_deterministic_response():
