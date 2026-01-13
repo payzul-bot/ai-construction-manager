@@ -5,7 +5,7 @@ from typing import Generator
 from fastapi import Depends, Header
 from sqlalchemy.orm import Session
 
-from app.common.errors import AppError
+from app.common.errors import AppError, raise_http
 from app.common.jwt_auth import JwtVerifier
 from app.infra.db.session import SessionLocal
 from app.settings import settings
@@ -24,13 +24,16 @@ def get_db() -> Generator[Session, None, None]:
 # -------------------- Tenant --------------------
 
 def get_tenant_id(x_tenant_id: str = Header(default="")) -> str:
-    if not x_tenant_id:
-        raise AppError(
-            code="tenant_required",
-            message="X-Tenant-Id header is required",
-            status_code=400,
+    tenant_id = (x_tenant_id or "").strip()
+    if not tenant_id:
+        raise_http(
+            AppError(
+                code="tenant_required",
+                message="X-Tenant-Id header is required",
+                status_code=400,
+            )
         )
-    return x_tenant_id
+    return tenant_id
 
 
 # -------------------- API KEY --------------------
