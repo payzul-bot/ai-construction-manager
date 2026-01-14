@@ -30,6 +30,9 @@ def get_db() -> Generator[Session, None, None]:
 def get_tenant_id(x_tenant_id: str | None = Header(default=None, alias="X-Tenant-Id")) -> str:
     tenant_id = (x_tenant_id or "").strip()
     if not tenant_id:
+        fallback = (settings.default_tenant_id or "").strip()
+        if settings.allow_tenant_header_fallback and fallback:
+            return fallback
         raise_http(
             AppError(
                 code="tenant_required",
