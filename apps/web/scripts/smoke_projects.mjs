@@ -1,4 +1,9 @@
-import { createProject, deleteProject, listProjects } from "../src/lib/api.js";
+import {
+  createProject,
+  deleteManyProjects,
+  deleteProject,
+  listProjects
+} from "../src/lib/api/index.js";
 
 const run = async () => {
   const projects = await listProjects();
@@ -18,6 +23,15 @@ const run = async () => {
 
   const updated = await listProjects();
   const updatedCount = Array.isArray(updated) ? updated.length : 0;
+
+  const deleteManyCreated = await createProject({
+    title: `Smoke Project Delete Many ${Date.now()}`,
+    meta: { source: "smoke" }
+  });
+  const deleteManyId = deleteManyCreated?.id || deleteManyCreated?.project_id;
+  if (deleteManyId) {
+    await deleteManyProjects([deleteManyId]);
+  }
 
   console.log(
     JSON.stringify(

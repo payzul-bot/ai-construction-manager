@@ -34,7 +34,7 @@ class PatchProjectBody(BaseModel):
 
 
 class DeleteManyProjectsBody(BaseModel):
-    ids: List[str] = Field(min_length=1)
+    project_ids: List[str] = Field(min_length=1)
 
 
 class DeleteManyOut(BaseModel):
