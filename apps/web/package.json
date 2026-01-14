@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "check:api-client": "node scripts/check_delete_many_payload.mjs",
     "smoke:projects": "node scripts/smoke_projects.mjs"
   },
   "dependencies": {
