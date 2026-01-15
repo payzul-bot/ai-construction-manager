@@ -53,3 +53,41 @@
 Данный документ является явным описанием режима разработки.
 При конфликте между реализацией и этим документом
 приоритет имеет **этот документ** для Фазы 1.
+
+---
+
+## Локальный запуск (детерминированно, с чистого checkout)
+
+### 1) Поднять инфраструктуру и API
+
+Из корня репозитория:
+
+```bash
+cp apps/api/.env.example apps/api/.env
+docker compose up -d --build
+```
+
+Проверка доступности API:
+
+```bash
+curl http://localhost:8000/health
+```
+
+### 2) Запустить фронтенд
+
+В отдельном терминале:
+
+```bash
+cd apps/web
+cp .env.local.example .env.local
+npm install
+npm run dev
+```
+
+Открыть: http://localhost:3000
+
+### 3) Переменные окружения (согласованные значения)
+
+- `NEXT_PUBLIC_API_BASE` = `http://localhost:8000`
+- `NEXT_PUBLIC_TENANT_ID` = `demo`
+- `NEXT_PUBLIC_API_KEY` = `11111111-1111-1111-1111-111111111111` (совпадает с `apps/api/.env.example`)
