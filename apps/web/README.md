@@ -12,7 +12,7 @@ cp .env.local.example .env.local
 
 - `NEXT_PUBLIC_API_BASE` — API base URL (default: `http://localhost:8000`)
 - `NEXT_PUBLIC_TENANT_ID` — tenant header value (default: `demo`)
-- `NEXT_PUBLIC_API_KEY` — optional; required only if the API enforces the Engine V1 key
+- `NEXT_PUBLIC_API_KEY` — required; matches the dev API key in `apps/api/.env.example`
 
 ## Local development (API via Docker)
 
