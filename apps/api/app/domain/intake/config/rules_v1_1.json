@@ -1,6 +1,15 @@
 {
   "version": "v1.1",
   "always_visible": [
+    "location_profile_id",
+    "selected_place.location_id",
+    "selected_place.country_iso2",
+    "selected_place.admin_level_1",
+    "selected_place.city",
+    "selected_place.address_line",
+    "selected_place.lat",
+    "selected_place.lon",
+    "selected_place.source",
     "work_type",
     "work_for",
     "work_class",
@@ -18,9 +27,11 @@
     "cleanup_waste.trash_container_volume_m3",
     "cleanup_waste.trash_container_count",
     "cleanup_waste.trash_container_distance_m",
-    "cleanup_waste.trash_removal_mode"
+    "cleanup_waste.trash_removal_mode",
+    "non_formalized_conditions"
   ],
   "always_required": [
+    "location_profile_id",
     "work_type",
     "work_for",
     "work_class",

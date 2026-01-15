@@ -148,6 +148,45 @@ def _build_applied_defaults(
     return applied
 
 
+def _prune_context(value: Any) -> Any:
+    if isinstance(value, dict):
+        cleaned = {key: _prune_context(val) for key, val in value.items()}
+        return {key: val for key, val in cleaned.items() if val not in (None, {}, [])}
+    if isinstance(value, list):
+        cleaned_list = [_prune_context(item) for item in value]
+        return [item for item in cleaned_list if item not in (None, {}, [])]
+    return value
+
+
+def _normalize_mall_areas(raw: Iterable[Any] | None) -> list[MallArea]:
+    if not raw:
+        return []
+    parsed: list[MallArea] = []
+    for item in raw:
+        try:
+            parsed.append(MallArea(item))
+        except ValueError:
+            continue
+    return parsed
+
+
+def _build_applied_defaults_for_payload(
+    intake_data: dict[str, Any],
+    profile: LocationProfile,
+) -> list[AppliedDefault]:
+    applied: list[AppliedDefault] = []
+    for field, value in profile.default_values.items():
+        if _get_by_path(intake_data, field) is None:
+            applied.append(AppliedDefault(field=field, value=value, source=profile.profile_id))
+    mall_defaults = _collect_mall_defaults(_normalize_mall_areas(intake_data.get("mall_areas")), profile)
+    for item in mall_defaults:
+        if _get_by_path(intake_data, item.field) is None:
+            applied.append(
+                AppliedDefault(field=item.field, value=item.value, source=f"{profile.profile_id}:mall")
+            )
+    return applied
+
+
 def evaluate_intake_rules(
     intake: ProjectIntakeV1_1,
     location_profile: LocationProfile,
@@ -179,6 +218,45 @@ def evaluate_intake_rules(
             required_fields.update(rule.fields)
 
     applied_defaults = _build_applied_defaults(intake, location_profile)
+
+    return RulesEngineOutput(
+        visible_fields=sorted(visible_fields),
+        required_fields=sorted(required_fields),
+        applied_defaults=applied_defaults,
+    )
+
+
+def evaluate_intake_rules_payload(
+    intake_data: dict[str, Any],
+    location_profile: LocationProfile,
+) -> RulesEngineOutput:
+    rules = _load_rules()
+    context_data = {
+        **(intake_data or {}),
+        "location_profile": location_profile.model_dump(),
+    }
+    provided_context = _prune_context(
+        {
+            **(intake_data or {}),
+            "location_profile": location_profile.model_dump(exclude_defaults=True, exclude_none=True),
+        }
+    )
+    context = RuleContext(data=context_data, provided=provided_context)
+
+    visible_fields = set(rules.always_visible)
+    required_fields = set(rules.always_required)
+    visible_fields.update(location_profile.visible_fields)
+    required_fields.update(location_profile.required_fields)
+
+    for rule in rules.visibility_rules:
+        if _eval_expression(rule.conditions, context):
+            visible_fields.update(rule.fields)
+
+    for rule in rules.required_rules:
+        if _eval_expression(rule.conditions, context):
+            required_fields.update(rule.fields)
+
+    applied_defaults = _build_applied_defaults_for_payload(intake_data or {}, location_profile)
 
     return RulesEngineOutput(
         visible_fields=sorted(visible_fields),

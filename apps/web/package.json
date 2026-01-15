@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "check:api-client": "node scripts/check_delete_many_payload.mjs",
-    "smoke:projects": "node scripts/smoke_projects.mjs"
+    "smoke:projects": "node scripts/smoke_projects.mjs",
+    "qa:intake": "node scripts/qa_intake_scenarios.mjs"
   },
   "dependencies": {
     "next": "14.2.5",

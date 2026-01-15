@@ -278,6 +278,7 @@ class ProjectIntakeV1_1(BaseModel):
     noise_dust_protection: NoiseDustProtection = Field(default_factory=NoiseDustProtection)
     cleanup_waste: CleanupWaste = Field(default_factory=CleanupWaste)
     cost_responsibility: Optional[CostResponsibility] = None
+    non_formalized_conditions: Optional[str] = None
 
     @model_validator(mode="after")
     def _validate_core_fields(self) -> "ProjectIntakeV1_1":
