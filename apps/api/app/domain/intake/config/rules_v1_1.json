@@ -1,0 +1,266 @@
+{
+  "version": "v1.1",
+  "always_visible": [
+    "work_type",
+    "work_for",
+    "work_class",
+    "work_location",
+    "access_logistics.vehicle_access_allowed",
+    "access_logistics.unloading_distance_m",
+    "cleanup_waste.cleanup_end_of_shift_required",
+    "cleanup_waste.cleanup_common_areas_required",
+    "cleanup_waste.trash_down_method",
+    "cleanup_waste.trash_down_methods_additional",
+    "cleanup_waste.trash_origin_floor",
+    "cleanup_waste.trash_target_level",
+    "cleanup_waste.trash_transfer_distance_m",
+    "cleanup_waste.trash_container_required",
+    "cleanup_waste.trash_container_volume_m3",
+    "cleanup_waste.trash_container_count",
+    "cleanup_waste.trash_container_distance_m",
+    "cleanup_waste.trash_removal_mode"
+  ],
+  "always_required": [
+    "work_type",
+    "work_for",
+    "work_class",
+    "work_location",
+    "access_logistics.vehicle_access_allowed",
+    "access_logistics.unloading_distance_m"
+  ],
+  "visibility_rules": [
+    {
+      "rule_id": "client_type_when_third_party",
+      "fields": ["client_type"],
+      "conditions": {
+        "all": [
+          {"field": "work_for", "op": "eq", "value": "third_party"}
+        ]
+      }
+    },
+    {
+      "rule_id": "object_category_when_uninferred",
+      "fields": ["object_category"],
+      "conditions": {
+        "any": [
+          {"field": "selected_place", "op": "missing"},
+          {"field": "selected_place.confidence_object_type", "op": "missing"},
+          {"field": "location_profile.visible_fields", "op": "contains", "value": "object_category"}
+        ]
+      }
+    },
+    {
+      "rule_id": "commercial_object_type_when_commercial",
+      "fields": ["commercial_object_type"],
+      "conditions": {
+        "all": [
+          {"field": "object_category", "op": "eq", "value": "commercial"}
+        ]
+      }
+    },
+    {
+      "rule_id": "mall_areas_when_commercial",
+      "fields": ["mall_areas"],
+      "conditions": {
+        "all": [
+          {"field": "object_category", "op": "eq", "value": "commercial"}
+        ]
+      }
+    },
+    {
+      "rule_id": "time_windows_from_profile_or_input",
+      "fields": [
+        "time_windows.work_time_start",
+        "time_windows.work_time_end",
+        "time_windows.work_blackout_intervals",
+        "time_windows.work_allowed_weekends",
+        "time_windows.work_allowed_holidays"
+      ],
+      "conditions": {
+        "any": [
+          {"field": "location_profile.visibility_flags.time_windows", "op": "eq", "value": true},
+          {"field": "time_windows.work_time_start", "op": "exists"},
+          {"field": "time_windows.work_time_end", "op": "exists"},
+          {"field": "time_windows.work_blackout_intervals", "op": "exists"}
+        ]
+      }
+    },
+    {
+      "rule_id": "inside_access_fields",
+      "fields": [
+        "access_logistics.freight_elevator_available",
+        "access_logistics.freight_elevator_time_start",
+        "access_logistics.freight_elevator_time_end",
+        "access_logistics.freight_elevator_protection_required",
+        "access_logistics.work_floor"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "work_location", "op": "eq", "value": "inside"}
+        ]
+      }
+    },
+    {
+      "rule_id": "outside_access_fields",
+      "fields": [
+        "access_logistics.vehicle_max_height_m",
+        "access_logistics.vehicle_max_weight_t",
+        "access_logistics.machinery_access_allowed"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "work_location", "op": "eq", "value": "outside"}
+        ]
+      }
+    },
+    {
+      "rule_id": "access_pass_fields",
+      "fields": [
+        "access_logistics.access_pass_required",
+        "access_logistics.access_lead_time_days"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "object_category", "op": "in", "value": ["commercial", "industrial"]}
+        ]
+      }
+    },
+    {
+      "rule_id": "height_trigger_visible",
+      "fields": ["work_at_height.height_above_1_8m"],
+      "conditions": {
+        "any": [
+          {"field": "work_location", "op": "eq", "value": "outside"},
+          {"field": "object_category", "op": "in", "value": ["commercial", "industrial"]},
+          {"field": "work_at_height.height_above_1_8m", "op": "exists"}
+        ]
+      }
+    },
+    {
+      "rule_id": "height_details_visible",
+      "fields": [
+        "work_at_height.work_height_m",
+        "work_at_height.height_above_5m",
+        "work_at_height.height_above_10m",
+        "work_at_height.height_work_conditions",
+        "work_at_height.height_access_method",
+        "work_at_height.height_safety_required"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "work_at_height.height_above_1_8m", "op": "eq", "value": true}
+        ]
+      }
+    },
+    {
+      "rule_id": "noise_dust_visibility",
+      "fields": [
+        "noise_dust_protection.noise_restriction_enabled",
+        "noise_dust_protection.noise_blackout_intervals",
+        "noise_dust_protection.dust_control_required"
+      ],
+      "conditions": {
+        "any": [
+          {"field": "location_profile.visibility_flags.noise_dust", "op": "eq", "value": true},
+          {"field": "noise_dust_protection.noise_restriction_enabled", "op": "exists"},
+          {"field": "noise_dust_protection.noise_blackout_intervals", "op": "exists"},
+          {"field": "noise_dust_protection.dust_control_required", "op": "exists"}
+        ]
+      }
+    },
+    {
+      "rule_id": "protection_visibility",
+      "fields": ["noise_dust_protection.protection_required_for"],
+      "conditions": {
+        "any": [
+          {"field": "location_profile.visibility_flags.protection", "op": "eq", "value": true},
+          {"field": "noise_dust_protection.protection_required_for", "op": "exists"}
+        ]
+      }
+    },
+    {
+      "rule_id": "cost_responsibility_visibility",
+      "fields": [
+        "cost_responsibility.payer_materials",
+        "cost_responsibility.payer_consumables",
+        "cost_responsibility.payer_equipment_rental",
+        "cost_responsibility.payer_height_access",
+        "cost_responsibility.payer_logistics",
+        "cost_responsibility.payer_cleanup",
+        "cost_responsibility.payer_trash_down",
+        "cost_responsibility.payer_container",
+        "cost_responsibility.payer_trash_removal"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "work_for", "op": "eq", "value": "third_party"}
+        ]
+      }
+    }
+  ],
+  "required_rules": [
+    {
+      "rule_id": "client_type_required",
+      "fields": ["client_type"],
+      "conditions": {
+        "all": [
+          {"field": "work_for", "op": "eq", "value": "third_party"}
+        ]
+      }
+    },
+    {
+      "rule_id": "inside_access_required",
+      "fields": [
+        "access_logistics.freight_elevator_available",
+        "access_logistics.freight_elevator_time_start",
+        "access_logistics.freight_elevator_time_end",
+        "access_logistics.freight_elevator_protection_required",
+        "access_logistics.work_floor"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "work_location", "op": "eq", "value": "inside"}
+        ]
+      }
+    },
+    {
+      "rule_id": "outside_access_required",
+      "fields": [
+        "access_logistics.vehicle_max_height_m",
+        "access_logistics.vehicle_max_weight_t"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "work_location", "op": "eq", "value": "outside"}
+        ]
+      }
+    },
+    {
+      "rule_id": "access_pass_required",
+      "fields": [
+        "access_logistics.access_pass_required",
+        "access_logistics.access_lead_time_days"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "object_category", "op": "in", "value": ["commercial", "industrial"]}
+        ]
+      }
+    },
+    {
+      "rule_id": "height_details_required",
+      "fields": [
+        "work_at_height.work_height_m",
+        "work_at_height.height_above_5m",
+        "work_at_height.height_above_10m",
+        "work_at_height.height_access_method",
+        "work_at_height.height_safety_required"
+      ],
+      "conditions": {
+        "all": [
+          {"field": "work_at_height.height_above_1_8m", "op": "eq", "value": true}
+        ]
+      }
+    }
+  ]
+}

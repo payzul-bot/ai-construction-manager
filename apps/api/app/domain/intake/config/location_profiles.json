@@ -1,0 +1,17 @@
+{
+  "profiles": [
+    {
+      "profile_id": "global_default_v1",
+      "match_rules": [],
+      "default_values": {},
+      "mall_area_defaults": {},
+      "visibility_flags": {
+        "time_windows": false,
+        "noise_dust": false,
+        "protection": false
+      },
+      "visible_fields": [],
+      "required_fields": []
+    }
+  ]
+}
