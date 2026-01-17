@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,7 +13,10 @@ class Settings(BaseSettings):
     app_name: str = "AI Construction Platform API"
     log_level: str = "INFO"
     max_body_bytes: int = 2_000_000  # 2 MB
-    cors: str = "http://localhost:3000,http://127.0.0.1:3000"
+    cors: str = Field(
+        default="http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001",
+        validation_alias=AliasChoices("CORS", "CORS_ORIGINS"),
+    )
 
     # --- AUTH ---
     jwt_secret: str = "dev-secret"
