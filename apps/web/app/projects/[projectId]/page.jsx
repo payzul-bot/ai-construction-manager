@@ -329,6 +329,9 @@ export default function ProjectDetailPage() {
           <Link href="/projects" style={{ color: "#2563eb", textDecoration: "none" }}>
             Projects
           </Link>
+          <Link href={`/projects/${projectId}/intake`} style={{ color: "#2563eb", textDecoration: "none" }}>
+            Intake V1.1
+          </Link>
         </nav>
       </header>
 
